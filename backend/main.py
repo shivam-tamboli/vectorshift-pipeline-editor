@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -5,9 +6,14 @@ from typing import List, Dict, Any
 
 app = FastAPI()
 
+# In production set ALLOWED_ORIGINS to your Vercel URL e.g.
+# ALLOWED_ORIGINS=https://your-app.vercel.app
+raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
+origins = [o.strip() for o in raw_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
