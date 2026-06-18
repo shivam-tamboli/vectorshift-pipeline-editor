@@ -64,7 +64,7 @@ const BaseNode = ({
     >
       {hovered && <NodeActions nodeId={id} color={color} />}
 
-      <div style={{ position: 'relative', width: 72, height: 72 }}>
+      <div style={{ position: 'relative', width: 80, height: 80 }}>
         {inputs.map((input, i) => (
           <Handle
             key={input.id}
@@ -75,7 +75,7 @@ const BaseNode = ({
             style={{
               width: 10, height: 10,
               background: color,
-              border: '2px solid #0a0a0a',
+              border: '2px solid #171717',
               borderRadius: '50%',
               top: verticalPosition(i, inputs.length),
               left: -5,
@@ -86,9 +86,9 @@ const BaseNode = ({
         <div
           className="vs-node"
           style={{
-            width: 72, height: 72,
-            background: '#1c1c1c',
-            borderRadius: 12,
+            width: 80, height: 80,
+            background: '#1e1e1e',
+            borderRadius: 14,
             border: '1px solid #2a2a2a',
             display: 'flex',
             alignItems: 'center',
@@ -99,15 +99,15 @@ const BaseNode = ({
         >
           <div
             style={{
-              width: 44, height: 44,
-              borderRadius: 10,
-              background: `${color}26`,
+              width: 50, height: 50,
+              borderRadius: 12,
+              background: `${color}22`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            {Icon && <Icon size={22} color={color} strokeWidth={2} />}
+            {Icon && <Icon size={26} color={color} strokeWidth={1.8} />}
           </div>
         </div>
 
@@ -121,7 +121,7 @@ const BaseNode = ({
             style={{
               width: 10, height: 10,
               background: color,
-              border: '2px solid #0a0a0a',
+              border: '2px solid #171717',
               borderRadius: '50%',
               top: verticalPosition(i, outputs.length),
               right: -5,

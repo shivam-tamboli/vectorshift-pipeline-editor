@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import {
   Workflow, GitBranch, Loader2, CheckCircle2, XCircle,
@@ -18,11 +18,19 @@ export const TopBar = () => {
   const { nodes, edges, pipelineName, setPipelineName } = useStore(selector, shallow);
   const [editing, setEditing]   = useState(false);
   const [draft,   setDraft]     = useState(pipelineName);
-  const [loading, setLoading]   = useState(false);
-  const [result,  setResult]    = useState(null);
-  const [modalOpen, setModal]   = useState(false);
-  const [error,   setError]     = useState('');
-  const inputRef = useRef(null);
+  const [loading,      setLoading]      = useState(false);
+  const [loadingStage, setLoadingStage] = useState('');
+  const [result,       setResult]       = useState(null);
+  const [modalOpen,    setModal]        = useState(false);
+  const [error,        setError]        = useState('');
+  const inputRef   = useRef(null);
+  const stageTimer = useRef(null);
+
+  // Warmup ping so backend is ready before user clicks Validate
+  useEffect(() => {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    fetch(`${API_URL}/`, { method: 'GET' }).catch(() => {});
+  }, []);
 
   const startEdit = () => {
     setDraft(pipelineName);
@@ -37,7 +45,14 @@ export const TopBar = () => {
 
   const handleValidate = async () => {
     setLoading(true);
+    setLoadingStage('Connecting…');
     setError('');
+
+    // Progressive stage messages for cold-start awareness
+    stageTimer.current = setTimeout(() => setLoadingStage('Analyzing…'), 3000);
+    const wakeTimer    = setTimeout(() => setLoadingStage('Waking up backend…'), 8000);
+    const waitTimer    = setTimeout(() => setLoadingStage('Almost there…'), 25000);
+
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       const res = await fetch(`${API_URL}/pipelines/parse`, {
@@ -51,7 +66,11 @@ export const TopBar = () => {
     } catch {
       setError('Backend unreachable');
     } finally {
+      clearTimeout(stageTimer.current);
+      clearTimeout(wakeTimer);
+      clearTimeout(waitTimer);
       setLoading(false);
+      setLoadingStage('');
     }
   };
 
@@ -132,7 +151,7 @@ export const TopBar = () => {
           }}
         >
           {loading ? <Loader2 size={14} className="animate-spin" /> : <GitBranch size={14} />}
-          {loading ? 'Analyzing…' : 'Validate Pipeline'}
+          {loading ? loadingStage : 'Validate Pipeline'}
         </button>
       </header>
 

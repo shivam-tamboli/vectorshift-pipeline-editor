@@ -240,7 +240,7 @@ export const PipelineUI = () => {
       )}
 
       <ReactFlow
-        style={{ background: '#0a0a0a' }}
+        style={{ background: '#171717' }}
         nodes={nodes}
         edges={displayEdges}
         onNodesChange={onNodesChange}
@@ -263,7 +263,7 @@ export const PipelineUI = () => {
         connectionLineStyle={{ stroke: '#6366f1', strokeWidth: 2 }}
         fitView
       >
-        <Background variant="dots" color="#2a2a2a" gap={24} size={1} />
+        <Background variant="dots" color="#2d2d2d" gap={24} size={1.5} />
         <Controls showInteractive={false} />
         <MiniMap
           nodeColor={(n) => {

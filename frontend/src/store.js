@@ -4,8 +4,8 @@ import { addEdge, applyNodeChanges, applyEdgeChanges, MarkerType } from 'reactfl
 const EDGE_STYLE = {
   type: 'default',
   animated: true,
-  style: { stroke: '#4a4a4a', strokeWidth: 2 },
-  markerEnd: { type: MarkerType.ArrowClosed, color: '#4a4a4a', width: 14, height: 14 },
+  style: { stroke: '#5c5c5c', strokeWidth: 2 },
+  markerEnd: { type: MarkerType.ArrowClosed, color: '#5c5c5c', width: 14, height: 14 },
 };
 
 export const useStore = create((set, get) => ({
