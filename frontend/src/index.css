@@ -5,19 +5,17 @@
 /* ── Global ──────────────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
-
   body {
-    @apply bg-canvas text-tx-primary antialiased;
+    @apply antialiased;
+    background: #0a0a0a;
+    color: #e2e8f0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
 /* ── Node field primitives ───────────────────────────────────── */
 @layer components {
-  .node-field {
-    @apply flex flex-col gap-1;
-  }
-
+  .node-field { @apply flex flex-col gap-1; }
   .node-label {
     @apply text-[10px] font-semibold uppercase tracking-widest;
     color: #4a5068;
@@ -32,250 +30,177 @@
     border: 1px solid #1e2236;
     color: #e2e8f0;
   }
-
-  .node-input:focus,
-  .node-select:focus,
-  .node-textarea:focus {
-    border-color: #6366f1;
-  }
+  .node-input:focus, .node-select:focus, .node-textarea:focus { border-color: #6366f1; }
 
   .node-select {
-    cursor: pointer;
-    appearance: none;
+    cursor: pointer; appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5068' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    padding-right: 26px;
+    background-repeat: no-repeat; background-position: right 8px center; padding-right: 26px;
+  }
+  .node-textarea { resize: none; min-height: 56px; line-height: 1.5; overflow: hidden; }
+  .node-info-text { @apply text-[11px] leading-relaxed; color: #4a5068; }
+  .node-vars      { @apply flex flex-wrap gap-1 mt-0.5; }
+
+  .node-var-badge {
+    @apply text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded;
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24;
   }
 
-  .node-textarea {
-    resize: none;
-    min-height: 56px;
-    line-height: 1.5;
-    overflow: hidden;
-  }
-
-  .node-info-text {
-    @apply text-[11px] leading-relaxed;
-    color: #4a5068;
-  }
-
-  .node-vars {
-    @apply flex flex-wrap gap-1 mt-0.5;
-  }
-
-  /* ── Node hover action toolbar ───────────────────────────── */
+  /* ── Hover toolbar ───────────────────────────────────────── */
   .node-actions {
-    @apply absolute flex items-center gap-1 z-50;
-    top: -38px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1d2b;
-    border: 1px solid #252a3e;
-    border-radius: 8px;
-    padding: 4px 5px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    white-space: nowrap;
-    animation: nodeActionsIn 0.12s ease;
+    @apply absolute flex items-center gap-1 z-[9999];
+    top: -38px; left: 50%; transform: translateX(-50%);
+    background: #1c1c1c; border: 1px solid #2a2a2a;
+    border-radius: 20px; padding: 4px 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    white-space: nowrap; animation: nodeActionsIn 0.12s ease;
   }
-
   .node-action-btn {
-    @apply flex items-center justify-center w-[26px] h-[26px] rounded-md;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #8892a4;
+    @apply flex items-center justify-center w-[26px] h-[26px] rounded-full;
+    background: transparent; border: none; cursor: pointer; color: #666;
     transition: background 0.12s, color 0.12s;
   }
-  .node-action-btn:hover {
-    background: #252a3e;
-    color: #e2e8f0;
-  }
-  .node-action-btn--danger:hover {
-    background: rgba(244, 63, 94, 0.15);
-    color: #f43f5e;
-  }
+  .node-action-btn:hover              { background: #2a2a2a; color: #e2e8f0; }
+  .node-action-btn--danger:hover      { background: rgba(239,68,68,0.15); color: #ef4444; }
 
-  /* Connect banner */
+  /* ── Connect banner ──────────────────────────────────────── */
   .connect-banner {
     @apply absolute flex items-center gap-2 text-xs font-medium rounded-lg px-3 py-2 z-50;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1d2b;
-    border: 1px solid #6366f1;
-    color: #e2e8f0;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    background: #1c1c1c; border: 1px solid #6366f1; color: #e2e8f0;
     box-shadow: 0 4px 20px rgba(99,102,241,0.25);
-    animation: nodeActionsIn 0.15s ease;
-    pointer-events: none;
+    animation: nodeActionsIn 0.15s ease; pointer-events: none;
   }
   .connect-kbd {
     @apply rounded px-1.5 py-0.5 text-[10px] font-mono;
-    background: #0c0e18;
-    border: 1px solid #252a3e;
-    color: #8892a4;
+    background: #0a0a0a; border: 1px solid #2a2a2a; color: #666;
   }
 
-  /* Sidebar node row */
+  /* ── Sidebar node row ────────────────────────────────────── */
   .sidebar-node {
     @apply flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg transition-colors select-none;
     cursor: grab;
   }
-  .sidebar-node:hover { background: #1a1d2b; }
+  .sidebar-node:hover  { background: #1c1c1c; }
   .sidebar-node:active { cursor: grabbing; }
 
-  .node-var-badge {
-    @apply text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded;
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #fbbf24;
-  }
-
-  /* Context menu */
+  /* ── Context menu ────────────────────────────────────────── */
   .context-menu {
     @apply fixed z-[2000] rounded-xl overflow-hidden py-1.5;
-    background: #1a1a2e;
-    border: 1px solid #252a3e;
-    min-width: 180px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    animation: contextIn 0.1s ease;
+    background: #1c1c1c; border: 1px solid #2a2a2a; min-width: 180px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7); animation: contextIn 0.1s ease;
   }
   .context-item {
     @apply w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #8892a4;
-    text-align: left;
+    background: transparent; border: none; cursor: pointer; color: #666; text-align: left;
   }
-  .context-item:hover {
-    background: #252a3e;
-    color: #e2e8f0;
+  .context-item:hover         { background: #2a2a2a; color: #e2e8f0; }
+  .context-item--danger:hover { background: rgba(239,68,68,0.12); color: #ef4444; }
+  .context-item--disabled     { opacity: 0.35; cursor: not-allowed; }
+  .context-sep { @apply my-1 mx-3; height: 1px; background: #2a2a2a; }
+
+  /* ── Edge insert button ──────────────────────────────────── */
+  .edge-add-btn {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #1c1c1c; border: 1px solid #4a4a4a;
+    color: #888; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   }
-  .context-item--danger:hover {
-    background: rgba(239,68,68,0.12);
-    color: #ef4444;
-  }
-  .context-item--disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-  .context-sep {
-    @apply my-1 mx-3;
-    height: 1px;
-    background: #1e2236;
-  }
+  .edge-add-btn:hover { background: #22c55e; border-color: #22c55e; color: #000; }
 }
 
 /* ── Sidebar search placeholder ──────────────────────────── */
-.sidebar-search::placeholder { color: #4a5068; }
+.sidebar-search::placeholder { color: #444; }
 
-/* ── ReactFlow canvas overrides ──────────────────────────────── */
-.react-flow__renderer,
-.react-flow__background {
-  background: #0f1015 !important;
-}
+/* ── ReactFlow canvas ────────────────────────────────────────── */
+.react-flow__renderer { background: #0a0a0a !important; }
 
+/* Handles: hidden by default, visible on hover/select */
 .react-flow__handle {
-  transition: transform 0.15s !important;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease !important;
 }
+.react-flow__node:hover .react-flow__handle,
+.react-flow__node.selected .react-flow__handle { opacity: 1; }
+.react-flow__handle:hover { transform: scale(1.4) !important; }
 
-.react-flow__handle:hover {
-  transform: scale(1.4) !important;
+/* Edges */
+.react-flow__edges .react-flow__edge .react-flow__edge-path {
+  stroke: #4a4a4a; stroke-width: 2; fill: none;
+  transition: stroke 0.2s, filter 0.2s, stroke-width 0.2s;
 }
-
-.react-flow__edge-path {
-  stroke: #3d3f65 !important;
-  stroke-width: 2 !important;
-  filter: drop-shadow(0 0 3px rgba(99,102,241,0.25));
-  transition: stroke 0.2s, filter 0.2s !important;
+.react-flow__edges .react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edges .react-flow__edge:hover   .react-flow__edge-path {
+  stroke: #22c55e; stroke-width: 2.5;
+  filter: drop-shadow(0 0 5px rgba(34,197,94,0.4));
 }
-
-.react-flow__edge.selected .react-flow__edge-path,
-.react-flow__edge:hover   .react-flow__edge-path {
-  stroke: #6366f1 !important;
-  stroke-width: 2.5 !important;
-  filter: drop-shadow(0 0 6px rgba(99,102,241,0.55)) !important;
-}
-
-.react-flow__edge.animated .react-flow__edge-path {
+.react-flow__edges .react-flow__edge.animated .react-flow__edge-path {
   stroke-dasharray: 6 3;
   animation: edgeFlow 0.5s linear infinite;
 }
 
-/* ── Node selection / hover glow — n8n style ─────────────────── */
+/* Node selection / hover glow */
 .react-flow__node .vs-node {
   transition: box-shadow 0.15s ease, border 0.15s ease;
 }
 .react-flow__node:not(.selected):hover .vs-node {
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.15) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
 }
 .react-flow__node.selected .vs-node {
   border: 2px solid #22c55e !important;
-  box-shadow: 0 0 0 4px rgba(34,197,94,0.2), 0 0 20px rgba(34,197,94,0.3) !important;
   animation: selectedPulse 2s ease-in-out infinite;
+}
+
+/* ReactFlow selection box */
+.react-flow__selection,
+.react-flow__nodesselection-rect {
+  background: rgba(34,197,94,0.04);
+  border: 1px solid rgba(34,197,94,0.3);
 }
 
 /* MiniMap */
 .react-flow__minimap {
-  background: #141620 !important;
-  border: 1px solid #1e2236 !important;
-  border-radius: 10px !important;
-  overflow: hidden !important;
+  background: #111111 !important; border: 1px solid #2a2a2a !important;
+  border-radius: 10px !important; overflow: hidden !important;
 }
-.react-flow__minimap-mask { fill: rgba(0, 0, 0, 0.45) !important; }
+.react-flow__minimap-mask { fill: rgba(0,0,0,0.5) !important; }
 
 /* Controls */
 .react-flow__controls {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  gap: 4px !important;
-  display: flex !important;
-  flex-direction: column !important;
+  background: transparent !important; border: none !important;
+  box-shadow: none !important; gap: 4px !important;
+  display: flex !important; flex-direction: column !important;
 }
 .react-flow__controls-button {
-  background: #141620 !important;
-  border: 1px solid #1e2236 !important;
-  border-radius: 8px !important;
-  color: #8892a4 !important;
-  fill: #8892a4 !important;
-  width: 28px !important;
-  height: 28px !important;
-  transition: background 0.15s, fill 0.15s !important;
-  margin: 0 !important;
+  background: #111111 !important; border: 1px solid #2a2a2a !important;
+  border-radius: 8px !important; color: #666 !important; fill: #666 !important;
+  width: 28px !important; height: 28px !important;
+  transition: background 0.15s, fill 0.15s !important; margin: 0 !important;
 }
-.react-flow__controls-button:hover {
-  background: #1a1d2b !important;
-  fill: #e2e8f0 !important;
-}
+.react-flow__controls-button:hover { background: #1c1c1c !important; fill: #e2e8f0 !important; }
 
-/* ── Shared animations ───────────────────────────────────────── */
+/* Config panel slide-in */
+.config-panel { animation: slideInRight 0.2s ease; }
+
+/* ── Animations ──────────────────────────────────────────────── */
 @keyframes nodeActionsIn {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
 }
-
 @keyframes selectedPulse {
-  0%   { box-shadow: 0 0 0 4px rgba(34,197,94,0.2),  0 0 20px rgba(34,197,94,0.3); }
-  50%  { box-shadow: 0 0 0 4px rgba(34,197,94,0.35), 0 0 30px rgba(34,197,94,0.4); }
-  100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.2),  0 0 20px rgba(34,197,94,0.3); }
-}
-
-/* ── Config panel slide-in ───────────────────────────────────── */
-.config-panel {
-  animation: slideInRight 0.2s ease;
+  0%,100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.2), 0 0 24px rgba(34,197,94,0.3); }
+  50%     { box-shadow: 0 0 0 4px rgba(34,197,94,0.4), 0 0 32px rgba(34,197,94,0.5); }
 }
 @keyframes slideInRight {
   from { transform: translateX(60px); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
-
 @keyframes contextIn {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1);   }
 }
-
 @keyframes edgeFlow {
   from { stroke-dashoffset: 18; }
   to   { stroke-dashoffset: 0;  }

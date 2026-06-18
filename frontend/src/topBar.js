@@ -61,7 +61,7 @@ export const TopBar = () => {
     <>
       <header
         className="flex items-center gap-3 px-4 flex-shrink-0 z-10"
-        style={{ height: 48, background: '#111111', borderBottom: '1px solid #1e2236' }}
+        style={{ height: 52, background: '#111111', borderBottom: '1px solid #2a2a2a' }}
       >
         {/* Logo */}
         <div className="flex items-center gap-2 select-none mr-1">

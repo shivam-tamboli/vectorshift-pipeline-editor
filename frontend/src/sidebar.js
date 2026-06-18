@@ -81,7 +81,7 @@ export const NodeSidebar = () => {
   return (
     <aside
       className="flex flex-col flex-shrink-0"
-      style={{ width: 256, background: '#111111', borderRight: '1px solid #1e2236' }}
+      style={{ width: 220, background: '#111111', borderRight: '1px solid #2a2a2a' }}
     >
       {/* Search */}
       <div className="px-3 pt-3 pb-3 flex-shrink-0" style={{ borderBottom: '1px solid #1e2236' }}>

@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import ReactFlow, { Controls, Background, MiniMap } from 'reactflow';
-import { Link2 } from 'lucide-react';
+import { Link2, LogIn, LogOut, Brain, FileText, Filter, Globe, Shuffle, GitMerge, StickyNote } from 'lucide-react';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
 import { ContextMenu } from './contextMenu';
+import { EdgeWithButton } from './edges/EdgeWithButton';
 import { InputNode }     from './nodes/inputNode';
 import { LLMNode }       from './nodes/llmNode';
 import { OutputNode }    from './nodes/outputNode';
@@ -16,7 +17,7 @@ import { NoteNode }      from './nodes/noteNode';
 
 import 'reactflow/dist/style.css';
 
-const gridSize   = 20;
+const gridSize   = 24;
 const proOptions = { hideAttribution: true };
 
 const nodeTypes = {
@@ -31,44 +32,45 @@ const nodeTypes = {
   note:         NoteNode,
 };
 
+const edgeTypes = { default: EdgeWithButton };
+
+const INSERT_NODES = [
+  { type: 'customInput',  label: 'Input',       color: '#3b82f6', icon: LogIn      },
+  { type: 'customOutput', label: 'Output',      color: '#10b981', icon: LogOut     },
+  { type: 'llm',          label: 'LLM',         color: '#8b5cf6', icon: Brain      },
+  { type: 'text',         label: 'Text',        color: '#f59e0b', icon: FileText   },
+  { type: 'filter',       label: 'Filter',      color: '#ef4444', icon: Filter     },
+  { type: 'apiRequest',   label: 'API Request', color: '#06b6d4', icon: Globe      },
+  { type: 'transform',    label: 'Transform',   color: '#14b8a6', icon: Shuffle    },
+  { type: 'merge',        label: 'Merge',       color: '#ec4899', icon: GitMerge   },
+  { type: 'note',         label: 'Note',        color: '#eab308', icon: StickyNote },
+];
+
 const selector = (state) => ({
-  nodes:             state.nodes,
-  edges:             state.edges,
-  getNodeID:         state.getNodeID,
-  addNode:           state.addNode,
-  onNodesChange:     state.onNodesChange,
-  onEdgesChange:     state.onEdgesChange,
-  onConnect:         state.onConnect,
-  setRfInstance:     state.setRfInstance,
-  setViewport:       state.setViewport,
-  pendingConnectId:  state.pendingConnectId,
-  selectedNodeId:    state.selectedNodeId,
+  nodes:            state.nodes,
+  edges:            state.edges,
+  getNodeID:        state.getNodeID,
+  addNode:          state.addNode,
+  onNodesChange:    state.onNodesChange,
+  onEdgesChange:    state.onEdgesChange,
+  onConnect:        state.onConnect,
+  setRfInstance:    state.setRfInstance,
+  setViewport:      state.setViewport,
+  pendingConnectId: state.pendingConnectId,
+  selectedNodeId:   state.selectedNodeId,
+  insertNodeOnEdge: state.insertNodeOnEdge,
 });
 
 export const PipelineUI = () => {
   const reactFlowWrapper = useRef(null);
   const [rfInst, setRfInst] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
+  const [insertMenu,  setInsertMenu]  = useState(null);
 
   const {
     nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect,
-    setRfInstance, setViewport, pendingConnectId, selectedNodeId,
+    setRfInstance, setViewport, pendingConnectId, selectedNodeId, insertNodeOnEdge,
   } = useStore(selector, shallow);
-
-  // Highlight edges connected to the selected node in green
-  const displayEdges = useMemo(() => {
-    if (!selectedNodeId) return edges;
-    return edges.map((e) => {
-      if (e.source === selectedNodeId || e.target === selectedNodeId) {
-        return {
-          ...e,
-          style: { stroke: '#22c55e', strokeWidth: 2.5, filter: 'drop-shadow(0 0 5px rgba(34,197,94,0.5))' },
-          markerEnd: { ...e.markerEnd, color: '#22c55e' },
-        };
-      }
-      return e;
-    });
-  }, [edges, selectedNodeId]);
 
   const handleInit = useCallback((instance) => {
     setRfInst(instance);
@@ -105,6 +107,7 @@ export const PipelineUI = () => {
   const onPaneClick = useCallback(() => {
     const s = useStore.getState();
     setContextMenu(null);
+    setInsertMenu(null);
     if (s.pendingConnectId) s.setPendingConnect(null);
     else s.setSelectedNodeId(null);
   }, []);
@@ -123,35 +126,58 @@ export const PipelineUI = () => {
     setViewport(vp);
   }, [setViewport]);
 
-  // Cancel connect mode on Escape
+  const handleEdgeAdd = useCallback((edgeId, canvasPos) => {
+    if (!rfInst) return;
+    const bounds = reactFlowWrapper.current.getBoundingClientRect();
+    const vp = rfInst.getViewport();
+    setInsertMenu({
+      edgeId,
+      canvasPos,
+      x: bounds.left + canvasPos.x * vp.zoom + vp.x,
+      y: bounds.top  + canvasPos.y * vp.zoom + vp.y,
+    });
+  }, [rfInst]);
+
+  const displayEdges = useMemo(() => edges.map((e) => {
+    const connected = selectedNodeId && (e.source === selectedNodeId || e.target === selectedNodeId);
+    return {
+      ...e,
+      type: 'default',
+      style: connected
+        ? { stroke: '#22c55e', strokeWidth: 2.5, filter: 'drop-shadow(0 0 5px rgba(34,197,94,0.5))' }
+        : (e.style || { stroke: '#4a4a4a', strokeWidth: 2 }),
+      markerEnd: connected ? { ...e.markerEnd, color: '#22c55e' } : e.markerEnd,
+      data: { ...e.data, onAdd: handleEdgeAdd },
+    };
+  }), [edges, selectedNodeId, handleEdgeAdd]);
+
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') useStore.getState().setPendingConnect(null);
+      if (e.key === 'Escape') {
+        useStore.getState().setPendingConnect(null);
+        setInsertMenu(null);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Global keyboard shortcuts
   useEffect(() => {
     const isInput = () => ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
     const onKey = (e) => {
       if (isInput()) return;
       const s = useStore.getState();
-
       if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
         e.preventDefault();
         const sel = s.nodes.find((n) => n.selected);
         if (sel) s.duplicateNode(sel.id);
         return;
       }
-
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
         e.preventDefault();
         s.rfInstance?.fitView({ duration: 400 });
         return;
       }
-
       if (e.key === 'Escape') {
         s.setSelectedNodeId(null);
         s.setPendingConnect(null);
@@ -173,8 +199,48 @@ export const PipelineUI = () => {
 
       <ContextMenu menu={contextMenu} onClose={() => setContextMenu(null)} />
 
+      {insertMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            left: insertMenu.x,
+            top: insertMenu.y,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 3000,
+            background: '#1c1c1c',
+            border: '1px solid #2a2a2a',
+            borderRadius: 12,
+            padding: 8,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 6,
+            maxWidth: 220,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p style={{ width: '100%', fontSize: 10, color: '#555', textAlign: 'center', marginBottom: 2, letterSpacing: '0.05em' }}>
+            INSERT NODE
+          </p>
+          {INSERT_NODES.map(({ type, label, color, icon: Icon }) => (
+            <button
+              key={type}
+              title={label}
+              onClick={() => { insertNodeOnEdge(insertMenu.edgeId, insertMenu.canvasPos, type); setInsertMenu(null); }}
+              style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: `${color}20`, border: `1px solid ${color}40`,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <Icon size={16} color={color} strokeWidth={2} />
+            </button>
+          ))}
+        </div>
+      )}
+
       <ReactFlow
-        style={{ background: '#0f0f0f' }}
+        style={{ background: '#0a0a0a' }}
         nodes={nodes}
         edges={displayEdges}
         onNodesChange={onNodesChange}
@@ -189,6 +255,7 @@ export const PipelineUI = () => {
         onPaneContextMenu={onPaneContextMenu}
         onMoveEnd={onMoveEnd}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         proOptions={proOptions}
         snapGrid={[gridSize, gridSize]}
         snapToGrid
@@ -196,7 +263,7 @@ export const PipelineUI = () => {
         connectionLineStyle={{ stroke: '#6366f1', strokeWidth: 2 }}
         fitView
       >
-        <Background variant="dots" color="#1e2236" gap={20} size={1.2} />
+        <Background variant="dots" color="#2a2a2a" gap={24} size={1} />
         <Controls showInteractive={false} />
         <MiniMap
           nodeColor={(n) => {

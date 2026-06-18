@@ -232,14 +232,14 @@ export const ConfigPanel = () => {
       className="config-panel flex flex-col flex-shrink-0"
       style={{
         width: 280,
-        background: '#141620',
-        borderLeft: '1px solid #1e2236',
+        background: '#111111',
+        borderLeft: '1px solid #2a2a2a',
       }}
     >
       {/* Header */}
       <div
         className="flex items-center gap-3 px-4 flex-shrink-0"
-        style={{ height: 52, borderBottom: '1px solid #1e2236' }}
+        style={{ height: 52, borderBottom: '1px solid #2a2a2a' }}
       >
         <div
           className="flex items-center justify-center w-7 h-7 rounded-lg flex-shrink-0"
@@ -258,7 +258,7 @@ export const ConfigPanel = () => {
           className="flex items-center justify-center w-7 h-7 rounded-lg flex-shrink-0"
           style={{
             background: 'transparent',
-            border: '1px solid #1e2236',
+            border: '1px solid #2a2a2a',
             cursor: 'pointer',
             transition: 'background 0.15s',
           }}
@@ -273,7 +273,7 @@ export const ConfigPanel = () => {
       {/* Fields */}
       <div
         className="flex-1 overflow-y-auto p-4 flex flex-col gap-3"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e2236 transparent' }}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#2a2a2a transparent' }}
       >
         {renderFields(node, onUpdate)}
       </div>
