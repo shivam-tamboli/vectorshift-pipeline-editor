@@ -5,7 +5,7 @@ export const FilterNode = ({ id, data }) => {
   const condition = data?.condition || '';
 
   return (
-    <BaseNode id={id} title="Filter" color="#f43f5e" icon={Filter}
+    <BaseNode id={id} title="Filter" color="#ef4444" icon={Filter}
               inputs={[{ id: 'input', label: 'Input' }]}
               outputs={[
                 { id: 'pass', label: 'Pass' },

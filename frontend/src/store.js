@@ -20,6 +20,16 @@ export const useStore = create((set, get) => ({
     pendingConnectId: null,
     setPendingConnect: (id) => set({ pendingConnectId: id }),
 
+    /* ── Pipeline meta ───────────────────────────────── */
+    pipelineName: 'Untitled Pipeline',
+    setPipelineName: (name) => set({ pipelineName: name }),
+
+    rfInstance: null,
+    setRfInstance: (instance) => set({ rfInstance: instance }),
+
+    viewport: { x: 0, y: 0, zoom: 1 },
+    setViewport: (vp) => set({ viewport: vp }),
+
     /* ── Node data ───────────────────────────────────── */
     updateNodeData: (nodeId, updates) =>
       set({
@@ -49,11 +59,36 @@ export const useStore = create((set, get) => ({
       });
     },
 
+    disconnectNode: (nodeId) =>
+      set({ edges: get().edges.filter((e) => e.source !== nodeId && e.target !== nodeId) }),
+
+    /* ── Clipboard ───────────────────────────────────── */
+    clipboard: null,
+    copyToClipboard: (nodeId) => {
+      const node = get().nodes.find((n) => n.id === nodeId);
+      if (node) set({ clipboard: node });
+    },
+    pasteFromClipboard: () => {
+      const cb = get().clipboard;
+      if (!cb) return;
+      const newId = `${cb.type}-paste-${Date.now()}`;
+      get().addNode({
+        ...cb,
+        id: newId,
+        position: { x: cb.position.x + 60, y: cb.position.y + 60 },
+        data: { ...cb.data, id: newId },
+        selected: false,
+      });
+    },
+
     quickConnect: (sourceId, targetId) =>
       set({
         edges: addEdge(
-          { source: sourceId, target: targetId, type: 'smoothstep', animated: true,
-            markerEnd: { type: MarkerType.Arrow, height: '20px', width: '20px' } },
+          {
+            source: sourceId, target: targetId, type: 'default', animated: true,
+            style: { stroke: '#6366f1', strokeWidth: 2 },
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1', width: 16, height: 16 },
+          },
           get().edges
         ),
       }),
@@ -82,18 +117,22 @@ export const useStore = create((set, get) => ({
         edges: applyEdgeChanges(changes, get().edges),
       });
     },
-    onConnect: (connection) => {
+    onConnect: (connection) =>
       set({
-        edges: addEdge({...connection, type: 'smoothstep', animated: true, markerEnd: {type: MarkerType.Arrow, height: '20px', width: '20px'}}, get().edges),
-      });
-    },
+        edges: addEdge({
+          ...connection,
+          type: 'default',
+          animated: true,
+          style: { stroke: '#6366f1', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1', width: 16, height: 16 },
+        }, get().edges),
+      }),
     updateNodeField: (nodeId, fieldName, fieldValue) => {
       set({
         nodes: get().nodes.map((node) => {
           if (node.id === nodeId) {
             node.data = { ...node.data, [fieldName]: fieldValue };
           }
-  
           return node;
         }),
       });

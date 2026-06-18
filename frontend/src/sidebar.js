@@ -1,77 +1,32 @@
 import { useState } from 'react';
 import {
-  Search, X, Workflow,
+  Search, X, ChevronDown, ChevronRight,
   LogIn, LogOut, Brain, FileText, Filter,
   Globe, Shuffle, GitMerge, StickyNote,
 } from 'lucide-react';
 
-const NODE_CATALOG = [
-  {
-    type: 'customInput',
-    label: 'Input',
-    description: 'Entry point for pipeline data',
-    color: '#3b82f6',
-    icon: LogIn,
-  },
-  {
-    type: 'customOutput',
-    label: 'Output',
-    description: 'Final destination for results',
-    color: '#10b981',
-    icon: LogOut,
-  },
-  {
-    type: 'llm',
-    label: 'LLM',
-    description: 'Send prompts to a language model',
-    color: '#a78bfa',
-    icon: Brain,
-  },
-  {
-    type: 'text',
-    label: 'Text',
-    description: 'Text with {{variable}} input handles',
-    color: '#f59e0b',
-    icon: FileText,
-  },
-  {
-    type: 'filter',
-    label: 'Filter',
-    description: 'Route data to pass or fail output',
-    color: '#f43f5e',
-    icon: Filter,
-  },
-  {
-    type: 'apiRequest',
-    label: 'API Request',
-    description: 'Make HTTP requests to any URL',
-    color: '#06b6d4',
-    icon: Globe,
-  },
-  {
-    type: 'transform',
-    label: 'Transform',
-    description: 'Apply transformations to data',
-    color: '#14b8a6',
-    icon: Shuffle,
-  },
-  {
-    type: 'merge',
-    label: 'Merge',
-    description: 'Combine two inputs into one',
-    color: '#ec4899',
-    icon: GitMerge,
-  },
-  {
-    type: 'note',
-    label: 'Note',
-    description: 'Annotate your canvas',
-    color: '#eab308',
-    icon: StickyNote,
-  },
+const NODE_CATALOG = {
+  customInput:  { label: 'Input',       desc: 'Entry point for data',           color: '#3b82f6', icon: LogIn      },
+  customOutput: { label: 'Output',      desc: 'Final destination for results',   color: '#10b981', icon: LogOut     },
+  text:         { label: 'Text',        desc: 'Text with {{variable}} handles',  color: '#f59e0b', icon: FileText   },
+  llm:          { label: 'LLM',         desc: 'Send prompts to a language model',color: '#8b5cf6', icon: Brain      },
+  filter:       { label: 'Filter',      desc: 'Route data to pass or fail',      color: '#ef4444', icon: Filter     },
+  transform:    { label: 'Transform',   desc: 'Apply data transformations',      color: '#14b8a6', icon: Shuffle    },
+  merge:        { label: 'Merge',       desc: 'Combine two inputs into one',     color: '#ec4899', icon: GitMerge   },
+  apiRequest:   { label: 'API Request', desc: 'Make HTTP requests',              color: '#06b6d4', icon: Globe      },
+  note:         { label: 'Note',        desc: 'Annotate your canvas',            color: '#eab308', icon: StickyNote },
+};
+
+const CATEGORIES = [
+  { name: 'DATA',        ids: ['customInput', 'customOutput', 'text'] },
+  { name: 'AI',          ids: ['llm'] },
+  { name: 'LOGIC',       ids: ['filter', 'transform', 'merge'] },
+  { name: 'INTEGRATION', ids: ['apiRequest'] },
+  { name: 'UTILITY',     ids: ['note'] },
 ];
 
-const SidebarNode = ({ type, label, description, color, icon: Icon }) => {
+const SidebarNode = ({ type }) => {
+  const { label, desc, color, icon: Icon } = NODE_CATALOG[type];
   const [dragging, setDragging] = useState(false);
 
   const onDragStart = (e) => {
@@ -92,57 +47,44 @@ const SidebarNode = ({ type, label, description, color, icon: Icon }) => {
         className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0"
         style={{ background: `${color}20` }}
       >
-        <Icon size={16} color={color} strokeWidth={2.5} />
+        <Icon size={15} color={color} strokeWidth={2.5} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium leading-tight" style={{ color: '#e2e8f0' }}>
-          {label}
-        </p>
-        <p className="text-xs leading-tight mt-0.5 truncate" style={{ color: '#4a5068' }}>
-          {description}
-        </p>
+        <p className="text-sm font-medium leading-tight" style={{ color: '#e2e8f0' }}>{label}</p>
+        <p className="text-xs leading-tight mt-0.5 truncate" style={{ color: '#4a5068' }}>{desc}</p>
       </div>
     </div>
   );
 };
 
 export const NodeSidebar = () => {
-  const [query, setQuery] = useState('');
+  const [query,     setQuery]     = useState('');
+  const [collapsed, setCollapsed] = useState(new Set());
 
-  const filtered = NODE_CATALOG.filter(
-    (n) =>
-      n.label.toLowerCase().includes(query.toLowerCase()) ||
-      n.description.toLowerCase().includes(query.toLowerCase())
-  );
+  const toggleCategory = (name) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  };
+
+  const flatAll = Object.keys(NODE_CATALOG);
+  const filtered = query
+    ? flatAll.filter((id) => {
+        const n = NODE_CATALOG[id];
+        const q = query.toLowerCase();
+        return n.label.toLowerCase().includes(q) || n.desc.toLowerCase().includes(q);
+      })
+    : null;
 
   return (
     <aside
       className="flex flex-col flex-shrink-0"
-      style={{
-        width: 256,
-        background: '#141620',
-        borderRight: '1px solid #1e2236',
-      }}
+      style={{ width: 256, background: '#111111', borderRight: '1px solid #1e2236' }}
     >
-      {/* Brand header — same height as submit bar (52px) */}
-      <div
-        className="flex items-center gap-2.5 px-4 flex-shrink-0"
-        style={{ height: 52, borderBottom: '1px solid #1e2236' }}
-      >
-        <div
-          className="flex items-center justify-center w-7 h-7 rounded-lg flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a78bfa 100%)' }}
-        >
-          <Workflow size={15} color="#fff" strokeWidth={2.5} />
-        </div>
-        <span className="text-sm font-bold" style={{ color: '#e2e8f0' }}>VectorShift</span>
-      </div>
-
-      {/* Search box */}
-      <div
-        className="px-3 py-3 flex-shrink-0"
-        style={{ borderBottom: '1px solid #1e2236' }}
-      >
+      {/* Search */}
+      <div className="px-3 pt-3 pb-3 flex-shrink-0" style={{ borderBottom: '1px solid #1e2236' }}>
         <div
           className="flex items-center gap-2 rounded-lg px-2.5"
           style={{ background: '#0c0e18', border: '1px solid #1e2236', height: 34 }}
@@ -167,32 +109,54 @@ export const NodeSidebar = () => {
         </div>
       </div>
 
-      {/* Section label */}
-      <div className="px-4 pt-3 pb-1 flex-shrink-0">
-        <span
-          className="text-[10px] font-semibold uppercase tracking-widest"
-          style={{ color: '#4a5068' }}
-        >
-          {query
-            ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`
-            : 'Nodes — drag onto canvas'}
-        </span>
-      </div>
-
-      {/* Scrollable node list */}
+      {/* Node list */}
       <div
-        className="flex-1 overflow-y-auto pb-4"
+        className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#1e2236 transparent' }}
       >
-        {filtered.length === 0 ? (
-          <div className="flex items-center justify-center py-12 px-4">
-            <p className="text-xs text-center" style={{ color: '#4a5068' }}>
-              No nodes match &ldquo;{query}&rdquo;
-            </p>
-          </div>
+        {filtered ? (
+          <>
+            <div className="px-4 pt-3 pb-1">
+              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#4a5068' }}>
+                {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+            {filtered.length === 0 ? (
+              <p className="text-xs text-center py-10 px-4" style={{ color: '#4a5068' }}>
+                No nodes match &ldquo;{query}&rdquo;
+              </p>
+            ) : (
+              filtered.map((id) => <SidebarNode key={id} type={id} />)
+            )}
+          </>
         ) : (
-          filtered.map((node) => <SidebarNode key={node.type} {...node} />)
+          CATEGORIES.map((cat) => {
+            const open = !collapsed.has(cat.name);
+            return (
+              <div key={cat.name}>
+                <button
+                  className="w-full flex items-center justify-between px-4 py-2 select-none"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                  onClick={() => toggleCategory(cat.name)}
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: '#4a5068' }}>
+                    {cat.name}
+                  </span>
+                  {open
+                    ? <ChevronDown  size={12} color="#4a5068" />
+                    : <ChevronRight size={12} color="#4a5068" />
+                  }
+                </button>
+                {open && cat.ids.map((id) => <SidebarNode key={id} type={id} />)}
+              </div>
+            );
+          })
         )}
+      </div>
+
+      {/* Footer hint */}
+      <div className="px-4 py-2 flex-shrink-0" style={{ borderTop: '1px solid #1e2236' }}>
+        <p className="text-[10px]" style={{ color: '#2d3348' }}>Drag nodes onto canvas</p>
       </div>
     </aside>
   );

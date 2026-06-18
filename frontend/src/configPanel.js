@@ -11,9 +11,9 @@ import { extractVariables } from './lib/utils';
 const NODE_META = {
   customInput:  { label: 'Input',       color: '#3b82f6', icon: LogIn      },
   customOutput: { label: 'Output',      color: '#10b981', icon: LogOut     },
-  llm:          { label: 'LLM',         color: '#a78bfa', icon: Brain      },
+  llm:          { label: 'LLM',         color: '#8b5cf6', icon: Brain      },
   text:         { label: 'Text',        color: '#f59e0b', icon: FileText   },
-  filter:       { label: 'Filter',      color: '#f43f5e', icon: Filter     },
+  filter:       { label: 'Filter',      color: '#ef4444', icon: Filter     },
   apiRequest:   { label: 'API Request', color: '#06b6d4', icon: Globe      },
   transform:    { label: 'Transform',   color: '#14b8a6', icon: Shuffle    },
   merge:        { label: 'Merge',       color: '#ec4899', icon: GitMerge   },
@@ -229,7 +229,7 @@ export const ConfigPanel = () => {
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0"
+      className="config-panel flex flex-col flex-shrink-0"
       style={{
         width: 280,
         background: '#141620',

@@ -110,7 +110,7 @@ const BaseNode = ({
       <div
         className="vs-node rounded-xl overflow-hidden shadow-2xl"
         style={{
-          background: '#1a1d2b',
+          background: '#1a1a2e',
           border: '1px solid #1e2236',
           borderLeft: `3px solid ${color}`,
           boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
@@ -136,6 +136,11 @@ const BaseNode = ({
           >
             {title}
           </span>
+          <div
+            className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{ background: '#2d3348', marginRight: 2 }}
+            title="idle"
+          />
         </div>
 
         {/* Body */}

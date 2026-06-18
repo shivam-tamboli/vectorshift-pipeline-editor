@@ -130,6 +130,41 @@
     border: 1px solid rgba(245, 158, 11, 0.3);
     color: #fbbf24;
   }
+
+  /* Context menu */
+  .context-menu {
+    @apply fixed z-[2000] rounded-xl overflow-hidden py-1.5;
+    background: #1a1a2e;
+    border: 1px solid #252a3e;
+    min-width: 180px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    animation: contextIn 0.1s ease;
+  }
+  .context-item {
+    @apply w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #8892a4;
+    text-align: left;
+  }
+  .context-item:hover {
+    background: #252a3e;
+    color: #e2e8f0;
+  }
+  .context-item--danger:hover {
+    background: rgba(239,68,68,0.12);
+    color: #ef4444;
+  }
+  .context-item--disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .context-sep {
+    @apply my-1 mx-3;
+    height: 1px;
+    background: #1e2236;
+  }
 }
 
 /* ── Sidebar search placeholder ──────────────────────────── */
@@ -150,14 +185,22 @@
 }
 
 .react-flow__edge-path {
-  stroke: #252a3e !important;
+  stroke: #3d3f65 !important;
   stroke-width: 2 !important;
+  filter: drop-shadow(0 0 3px rgba(99,102,241,0.25));
+  transition: stroke 0.2s, filter 0.2s !important;
 }
 
 .react-flow__edge.selected .react-flow__edge-path,
 .react-flow__edge:hover   .react-flow__edge-path {
   stroke: #6366f1 !important;
   stroke-width: 2.5 !important;
+  filter: drop-shadow(0 0 6px rgba(99,102,241,0.55)) !important;
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 6 3;
+  animation: edgeFlow 0.5s linear infinite;
 }
 
 /* wrapper now sits between react-flow__node and vs-node — use descendant selector */
@@ -204,4 +247,23 @@
 @keyframes nodeActionsIn {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
+}
+
+/* ── Config panel slide-in ───────────────────────────────────── */
+.config-panel {
+  animation: slideInRight 0.2s ease;
+}
+@keyframes slideInRight {
+  from { transform: translateX(60px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes contextIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+@keyframes edgeFlow {
+  from { stroke-dashoffset: 18; }
+  to   { stroke-dashoffset: 0;  }
 }
