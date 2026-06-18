@@ -1,14 +1,16 @@
-import { PipelineToolbar } from './toolbar';
-import { PipelineUI }      from './ui';
-import { SubmitButton }    from './submit';
-import { Analytics }       from '@vercel/analytics/react';
+import { NodeSidebar }  from './sidebar';
+import { PipelineUI }   from './ui';
+import { SubmitButton } from './submit';
+import { Analytics }    from '@vercel/analytics/react';
 
 function App() {
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-canvas">
-      <PipelineToolbar />
-      <PipelineUI />
-      <SubmitButton />
+    <div className="flex h-screen overflow-hidden bg-canvas">
+      <NodeSidebar />
+      <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+        <PipelineUI />
+        <SubmitButton />
+      </div>
       <Analytics />
     </div>
   );

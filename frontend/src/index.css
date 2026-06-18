@@ -64,6 +64,14 @@
     @apply flex flex-wrap gap-1 mt-0.5;
   }
 
+  /* Sidebar node row */
+  .sidebar-node {
+    @apply flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg transition-colors select-none;
+    cursor: grab;
+  }
+  .sidebar-node:hover { background: #1a1d2b; }
+  .sidebar-node:active { cursor: grabbing; }
+
   .node-var-badge {
     @apply text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded;
     background: rgba(245, 158, 11, 0.12);
@@ -71,6 +79,9 @@
     color: #fbbf24;
   }
 }
+
+/* ── Sidebar search placeholder ──────────────────────────── */
+.sidebar-search::placeholder { color: #4a5068; }
 
 /* ── ReactFlow canvas overrides ──────────────────────────────── */
 .react-flow__renderer,
