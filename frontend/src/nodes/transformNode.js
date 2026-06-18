@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Shuffle } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const TransformNode = ({ id, data }) => {
@@ -8,7 +9,8 @@ export const TransformNode = ({ id, data }) => {
     <BaseNode
       id={id}
       title="Transform"
-      color="#0d9488"
+      color="#14b8a6"
+      icon={Shuffle}
       inputs={[{ id: 'input', label: 'Input' }]}
       outputs={[{ id: 'output', label: 'Output' }]}
     >

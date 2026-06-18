@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { StickyNote } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const NoteNode = ({ id, data }) => {
@@ -8,7 +9,8 @@ export const NoteNode = ({ id, data }) => {
     <BaseNode
       id={id}
       title="Note"
-      color="#ca8a04"
+      color="#eab308"
+      icon={StickyNote}
       inputs={[]}
       outputs={[]}
       minWidth={200}

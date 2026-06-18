@@ -1,11 +1,13 @@
+import { Brain } from 'lucide-react';
 import BaseNode from './BaseNode';
 
-export const LLMNode = ({ id, data }) => {
+export const LLMNode = ({ id }) => {
   return (
     <BaseNode
       id={id}
       title="LLM"
-      color="#7c3aed"
+      color="#a78bfa"
+      icon={Brain}
       inputs={[
         { id: 'system', label: 'System Prompt' },
         { id: 'prompt', label: 'User Prompt' },

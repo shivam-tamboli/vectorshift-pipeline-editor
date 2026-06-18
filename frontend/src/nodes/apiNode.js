@@ -1,15 +1,17 @@
 import { useState } from 'react';
+import { Globe } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const ApiNode = ({ id, data }) => {
   const [method, setMethod] = useState(data?.method || 'GET');
-  const [url, setUrl] = useState(data?.url || '');
+  const [url, setUrl]       = useState(data?.url || '');
 
   return (
     <BaseNode
       id={id}
       title="API Request"
-      color="#0891b2"
+      color="#06b6d4"
+      icon={Globe}
       inputs={[{ id: 'body', label: 'Request Body' }]}
       outputs={[{ id: 'response', label: 'Response' }]}
       minWidth={240}

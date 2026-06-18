@@ -75,6 +75,7 @@ export const PipelineUI = () => {
   return (
     <div ref={reactFlowWrapper} style={{ flex: 1 }}>
       <ReactFlow
+        style={{ background: '#0f1015' }}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -90,9 +91,20 @@ export const PipelineUI = () => {
         connectionLineType="smoothstep"
         fitView
       >
-        <Background color="#1f2937" gap={gridSize} />
-        <Controls />
-        <MiniMap nodeColor={() => '#2d3748'} />
+        <Background variant="dots" color="#1e2236" gap={20} size={1.2} />
+        <Controls showInteractive={false} />
+        <MiniMap
+          nodeColor={(n) => {
+            const colorMap = {
+              customInput: '#3b82f6', customOutput: '#10b981',
+              llm: '#a78bfa', text: '#f59e0b', filter: '#f43f5e',
+              apiRequest: '#06b6d4', transform: '#14b8a6',
+              merge: '#ec4899', note: '#eab308',
+            };
+            return colorMap[n.type] || '#6366f1';
+          }}
+          maskColor="rgba(0,0,0,0.5)"
+        />
       </ReactFlow>
     </div>
   );

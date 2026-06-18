@@ -1,17 +1,17 @@
 import { useState } from 'react';
+import { LogIn } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const InputNode = ({ id, data }) => {
-  const [currName, setCurrName] = useState(
-    data?.inputName || id.replace('customInput-', 'input_')
-  );
+  const [currName, setCurrName]   = useState(data?.inputName || id.replace('customInput-', 'input_'));
   const [inputType, setInputType] = useState(data?.inputType || 'Text');
 
   return (
     <BaseNode
       id={id}
       title="Input"
-      color="#2563eb"
+      color="#3b82f6"
+      icon={LogIn}
       inputs={[]}
       outputs={[{ id: 'value', label: 'Value' }]}
     >

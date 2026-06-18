@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Filter } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const FilterNode = ({ id, data }) => {
@@ -8,7 +9,8 @@ export const FilterNode = ({ id, data }) => {
     <BaseNode
       id={id}
       title="Filter"
-      color="#dc2626"
+      color="#f43f5e"
+      icon={Filter}
       inputs={[{ id: 'input', label: 'Input' }]}
       outputs={[
         { id: 'pass', label: 'Pass' },

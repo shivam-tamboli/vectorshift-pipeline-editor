@@ -1,17 +1,17 @@
 import { useState } from 'react';
+import { LogOut } from 'lucide-react';
 import BaseNode from './BaseNode';
 
 export const OutputNode = ({ id, data }) => {
-  const [currName, setCurrName] = useState(
-    data?.outputName || id.replace('customOutput-', 'output_')
-  );
+  const [currName, setCurrName]     = useState(data?.outputName || id.replace('customOutput-', 'output_'));
   const [outputType, setOutputType] = useState(data?.outputType || 'Text');
 
   return (
     <BaseNode
       id={id}
       title="Output"
-      color="#059669"
+      color="#10b981"
+      icon={LogOut}
       inputs={[{ id: 'value', label: 'Value' }]}
       outputs={[]}
     >

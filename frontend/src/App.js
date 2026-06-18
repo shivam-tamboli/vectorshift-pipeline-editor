@@ -5,7 +5,7 @@ import { Analytics }       from '@vercel/analytics/react';
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div className="flex flex-col h-screen overflow-hidden bg-canvas">
       <PipelineToolbar />
       <PipelineUI />
       <SubmitButton />
