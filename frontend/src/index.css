@@ -203,10 +203,17 @@
   animation: edgeFlow 0.5s linear infinite;
 }
 
-/* wrapper now sits between react-flow__node and vs-node — use descendant selector */
+/* ── Node selection / hover glow — n8n style ─────────────────── */
+.react-flow__node .vs-node {
+  transition: box-shadow 0.15s ease, border 0.15s ease;
+}
+.react-flow__node:not(.selected):hover .vs-node {
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15) !important;
+}
 .react-flow__node.selected .vs-node {
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5), 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-  border-color: #6366f1 !important;
+  border: 2px solid #22c55e !important;
+  box-shadow: 0 0 0 4px rgba(34,197,94,0.2), 0 0 20px rgba(34,197,94,0.3) !important;
+  animation: selectedPulse 2s ease-in-out infinite;
 }
 
 /* MiniMap */
@@ -247,6 +254,12 @@
 @keyframes nodeActionsIn {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
+}
+
+@keyframes selectedPulse {
+  0%   { box-shadow: 0 0 0 4px rgba(34,197,94,0.2),  0 0 20px rgba(34,197,94,0.3); }
+  50%  { box-shadow: 0 0 0 4px rgba(34,197,94,0.35), 0 0 30px rgba(34,197,94,0.4); }
+  100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.2),  0 0 20px rgba(34,197,94,0.3); }
 }
 
 /* ── Config panel slide-in ───────────────────────────────────── */

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import ReactFlow, { Controls, Background, MiniMap } from 'reactflow';
 import { Link2 } from 'lucide-react';
 import { useStore } from './store';
@@ -42,6 +42,7 @@ const selector = (state) => ({
   setRfInstance:     state.setRfInstance,
   setViewport:       state.setViewport,
   pendingConnectId:  state.pendingConnectId,
+  selectedNodeId:    state.selectedNodeId,
 });
 
 export const PipelineUI = () => {
@@ -51,8 +52,23 @@ export const PipelineUI = () => {
 
   const {
     nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect,
-    setRfInstance, setViewport, pendingConnectId,
+    setRfInstance, setViewport, pendingConnectId, selectedNodeId,
   } = useStore(selector, shallow);
+
+  // Highlight edges connected to the selected node in green
+  const displayEdges = useMemo(() => {
+    if (!selectedNodeId) return edges;
+    return edges.map((e) => {
+      if (e.source === selectedNodeId || e.target === selectedNodeId) {
+        return {
+          ...e,
+          style: { stroke: '#22c55e', strokeWidth: 2.5, filter: 'drop-shadow(0 0 5px rgba(34,197,94,0.5))' },
+          markerEnd: { ...e.markerEnd, color: '#22c55e' },
+        };
+      }
+      return e;
+    });
+  }, [edges, selectedNodeId]);
 
   const handleInit = useCallback((instance) => {
     setRfInst(instance);
@@ -160,7 +176,7 @@ export const PipelineUI = () => {
       <ReactFlow
         style={{ background: '#0f0f0f' }}
         nodes={nodes}
-        edges={edges}
+        edges={displayEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

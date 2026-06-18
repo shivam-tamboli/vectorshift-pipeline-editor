@@ -111,10 +111,9 @@ const BaseNode = ({
         className="vs-node rounded-xl overflow-hidden shadow-2xl"
         style={{
           background: '#1a1a2e',
-          border: '1px solid #1e2236',
           borderLeft: `3px solid ${color}`,
           boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-          transition: 'box-shadow 0.2s',
+          transition: 'box-shadow 0.15s ease, border 0.15s ease',
         }}
       >
         {/* Header */}
