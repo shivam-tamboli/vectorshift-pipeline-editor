@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import ReactFlow, { Controls, Background, MiniMap } from 'reactflow';
-import { Link2, LogIn, LogOut, Brain, FileText, Filter, Globe, Shuffle, GitMerge, StickyNote } from 'lucide-react';
+import { Link2, LogIn, LogOut, Brain, FileText, Filter, Globe, Shuffle, GitMerge, StickyNote, MousePointerClick, Workflow, GitBranch } from 'lucide-react';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
 import { ContextMenu } from './contextMenu';
@@ -236,6 +236,86 @@ export const PipelineUI = () => {
               <Icon size={16} color={color} strokeWidth={2} />
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Empty-canvas onboarding — disappears the moment a node is added */}
+      {nodes.length === 0 && (
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none', zIndex: 5,
+        }}>
+          <div style={{
+            background: 'rgba(20,20,20,0.92)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid #2a2a2a',
+            borderRadius: 16,
+            padding: '32px 40px',
+            textAlign: 'center',
+            maxWidth: 400,
+            boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+          }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 14,
+              background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}>
+              <Workflow size={24} color="#fff" strokeWidth={2} />
+            </div>
+            <p style={{ color: '#e2e8f0', fontSize: 16, fontWeight: 700, marginBottom: 4 }}>
+              Start building your pipeline
+            </p>
+            <p style={{ color: '#555', fontSize: 12, marginBottom: 24, lineHeight: 1.5 }}>
+              Follow these 3 steps to create your first pipeline
+            </p>
+
+            {[
+              {
+                step: '1',
+                color: '#6366f1',
+                icon: MousePointerClick,
+                title: 'Drag a node',
+                desc: 'Pick any node from the left sidebar and drag it onto this canvas',
+              },
+              {
+                step: '2',
+                color: '#22c55e',
+                icon: Link2,
+                title: 'Connect nodes',
+                desc: 'Hover a node to see dots on its edges — drag between dots to connect',
+              },
+              {
+                step: '3',
+                color: '#f59e0b',
+                icon: GitBranch,
+                title: 'Validate',
+                desc: 'Click "Validate Pipeline" in the top bar to check your work',
+              },
+            ].map(({ step, color, icon: Icon, title, desc }) => (
+              <div key={step} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 14,
+                textAlign: 'left', marginBottom: 16,
+              }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                  background: `${color}20`, border: `1px solid ${color}40`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={13} color={color} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p style={{ color: '#c0c0c0', fontSize: 12, fontWeight: 600, marginBottom: 2 }}>{title}</p>
+                  <p style={{ color: '#555', fontSize: 11, lineHeight: 1.5 }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+
+            <p style={{ color: '#333', fontSize: 10, marginTop: 8 }}>
+              Right-click the canvas for more options · Press&nbsp;<kbd style={{ background:'#2a2a2a',border:'1px solid #3a3a3a',borderRadius:4,padding:'1px 5px',color:'#888',fontSize:10 }}>?</kbd>&nbsp;for shortcuts
+            </p>
+          </div>
         </div>
       )}
 
