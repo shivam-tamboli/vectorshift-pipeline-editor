@@ -1,6 +1,7 @@
 import { NodeSidebar }  from './sidebar';
 import { PipelineUI }   from './ui';
 import { SubmitButton } from './submit';
+import { ConfigPanel }  from './configPanel';
 import { Analytics }    from '@vercel/analytics/react';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
         <PipelineUI />
         <SubmitButton />
       </div>
+      <ConfigPanel />
       <Analytics />
     </div>
   );

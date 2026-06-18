@@ -11,6 +11,14 @@ import {
 export const useStore = create((set, get) => ({
     nodes: [],
     edges: [],
+    selectedNodeId: null,
+    setSelectedNodeId: (id) => set({ selectedNodeId: id }),
+    updateNodeData: (nodeId, updates) =>
+      set({
+        nodes: get().nodes.map((n) =>
+          n.id === nodeId ? { ...n, data: { ...n.data, ...updates } } : n
+        ),
+      }),
     getNodeID: (type) => {
         const newIDs = {...get().nodeIDs};
         if (newIDs[type] === undefined) {

@@ -31,19 +31,20 @@ const nodeTypes = {
 };
 
 const selector = (state) => ({
-  nodes:          state.nodes,
-  edges:          state.edges,
-  getNodeID:      state.getNodeID,
-  addNode:        state.addNode,
-  onNodesChange:  state.onNodesChange,
-  onEdgesChange:  state.onEdgesChange,
-  onConnect:      state.onConnect,
+  nodes:              state.nodes,
+  edges:              state.edges,
+  getNodeID:          state.getNodeID,
+  addNode:            state.addNode,
+  onNodesChange:      state.onNodesChange,
+  onEdgesChange:      state.onEdgesChange,
+  onConnect:          state.onConnect,
+  setSelectedNodeId:  state.setSelectedNodeId,
 });
 
 export const PipelineUI = () => {
   const reactFlowWrapper = useRef(null);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const { nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect } =
+  const { nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect, setSelectedNodeId } =
     useStore(selector, shallow);
 
   const onDrop = useCallback(
@@ -72,6 +73,9 @@ export const PipelineUI = () => {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
+  const onNodeClick  = useCallback((_e, node) => setSelectedNodeId(node.id),  [setSelectedNodeId]);
+  const onPaneClick  = useCallback(()          => setSelectedNodeId(null),     [setSelectedNodeId]);
+
   return (
     <div ref={reactFlowWrapper} style={{ flex: 1 }}>
       <ReactFlow
@@ -84,6 +88,8 @@ export const PipelineUI = () => {
         onDrop={onDrop}
         onDragOver={onDragOver}
         onInit={setReactFlowInstance}
+        onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         proOptions={proOptions}
         snapGrid={[gridSize, gridSize]}

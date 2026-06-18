@@ -66,8 +66,10 @@ const BaseNode = ({
         </span>
       </div>
 
-      {/* Body */}
-      <div className="p-3 flex flex-col gap-2.5">{children}</div>
+      {/* Body — only rendered when children are present */}
+      {!!children && (
+        <div className="p-3 flex flex-col gap-2.5">{children}</div>
+      )}
 
       {/* Output handles */}
       {outputs.map((output, i) => (

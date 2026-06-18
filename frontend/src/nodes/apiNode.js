@@ -1,43 +1,23 @@
-import { useState } from 'react';
 import { Globe } from 'lucide-react';
 import BaseNode from './BaseNode';
 
+const COLOR = '#06b6d4';
+
 export const ApiNode = ({ id, data }) => {
-  const [method, setMethod] = useState(data?.method || 'GET');
-  const [url, setUrl]       = useState(data?.url || '');
+  const method = data?.method || 'GET';
+  const url    = data?.url    || '';
 
   return (
-    <BaseNode
-      id={id}
-      title="API Request"
-      color="#06b6d4"
-      icon={Globe}
-      inputs={[{ id: 'body', label: 'Request Body' }]}
-      outputs={[{ id: 'response', label: 'Response' }]}
-      minWidth={240}
-    >
-      <div className="node-field">
-        <label className="node-label">Method</label>
-        <select
-          className="node-select"
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-        >
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-        </select>
-      </div>
-      <div className="node-field">
-        <label className="node-label">URL</label>
-        <input
-          className="node-input"
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://api.example.com/endpoint"
-        />
+    <BaseNode id={id} title="API Request" color={COLOR} icon={Globe}
+              inputs={[{ id: 'body', label: 'Request Body' }]}
+              outputs={[{ id: 'response', label: 'Response' }]}
+              minWidth={220}>
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0"
+              style={{ background: `${COLOR}20`, color: COLOR }}>{method}</span>
+        {url && (
+          <p className="text-[10px] truncate" style={{ color: '#8892a4' }}>{url}</p>
+        )}
       </div>
     </BaseNode>
   );
