@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { Link2 } from 'lucide-react';
 import ReactFlow, { Controls, Background, MiniMap } from 'reactflow';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
@@ -39,13 +40,14 @@ const selector = (state) => ({
   onEdgesChange:      state.onEdgesChange,
   onConnect:          state.onConnect,
   setSelectedNodeId:  state.setSelectedNodeId,
+  pendingConnectId:   state.pendingConnectId,
 });
 
 export const PipelineUI = () => {
   const reactFlowWrapper = useRef(null);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
-  const { nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect, setSelectedNodeId } =
-    useStore(selector, shallow);
+  const { nodes, edges, getNodeID, addNode, onNodesChange, onEdgesChange, onConnect,
+          setSelectedNodeId, pendingConnectId } = useStore(selector, shallow);
 
   const onDrop = useCallback(
     (event) => {
@@ -73,11 +75,42 @@ export const PipelineUI = () => {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  const onNodeClick  = useCallback((_e, node) => setSelectedNodeId(node.id),  [setSelectedNodeId]);
-  const onPaneClick  = useCallback(()          => setSelectedNodeId(null),     [setSelectedNodeId]);
+  // Read state directly inside callback to avoid stale closure issues
+  const onNodeClick = useCallback((_e, clickedNode) => {
+    const s = useStore.getState();
+    if (s.pendingConnectId && s.pendingConnectId !== clickedNode.id) {
+      s.quickConnect(s.pendingConnectId, clickedNode.id);
+      s.setPendingConnect(null);
+    } else if (!s.pendingConnectId) {
+      s.setSelectedNodeId(clickedNode.id);
+    }
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    const s = useStore.getState();
+    if (s.pendingConnectId) s.setPendingConnect(null);
+    else s.setSelectedNodeId(null);
+  }, []);
+
+  // Cancel connect mode on Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') useStore.getState().setPendingConnect(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
-    <div ref={reactFlowWrapper} style={{ flex: 1 }}>
+    <div ref={reactFlowWrapper} style={{ flex: 1, position: 'relative' }}>
+      {pendingConnectId && (
+        <div className="connect-banner">
+          <Link2 size={13} />
+          Click a node to connect &nbsp;—&nbsp;
+          <kbd className="connect-kbd">Esc</kbd>
+          &nbsp;to cancel
+        </div>
+      )}
       <ReactFlow
         style={{ background: '#0f1015' }}
         nodes={nodes}

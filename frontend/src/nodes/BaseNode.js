@@ -1,8 +1,65 @@
+import { useRef, useState } from 'react';
 import { Handle, Position } from 'reactflow';
+import { Trash2, Copy, Pencil, Link2 } from 'lucide-react';
+import { useStore } from '../store';
 
 const verticalPosition = (index, total) =>
   total === 1 ? '50%' : `${((index + 1) / (total + 1)) * 100}%`;
 
+/* ── Hover action toolbar ─────────────────────────────────────── */
+const NodeActions = ({ nodeId, color }) => {
+  const { deleteNode, duplicateNode, setSelectedNodeId, setPendingConnect } = useStore((s) => ({
+    deleteNode:        s.deleteNode,
+    duplicateNode:     s.duplicateNode,
+    setSelectedNodeId: s.setSelectedNodeId,
+    setPendingConnect: s.setPendingConnect,
+  }));
+
+  const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
+
+  const buttons = [
+    {
+      icon: Trash2,
+      label: 'Delete node',
+      danger: true,
+      onClick: stop(() => deleteNode(nodeId)),
+    },
+    {
+      icon: Copy,
+      label: 'Duplicate',
+      onClick: stop(() => duplicateNode(nodeId)),
+    },
+    {
+      icon: Pencil,
+      label: 'Edit / Configure',
+      onClick: stop(() => setSelectedNodeId(nodeId)),
+    },
+    {
+      icon: Link2,
+      label: 'Quick connect — click another node',
+      onClick: stop(() => setPendingConnect(nodeId)),
+      accent: color,
+    },
+  ];
+
+  return (
+    <div className="node-actions">
+      {buttons.map(({ icon: Icon, label, danger, onClick, accent }) => (
+        <button
+          key={label}
+          title={label}
+          onClick={onClick}
+          className={`node-action-btn${danger ? ' node-action-btn--danger' : ''}`}
+          style={accent ? { '--accent': accent } : undefined}
+        >
+          <Icon size={13} strokeWidth={2.5} />
+        </button>
+      ))}
+    </div>
+  );
+};
+
+/* ── Base node wrapper ────────────────────────────────────────── */
 const BaseNode = ({
   id,
   title,
@@ -13,19 +70,24 @@ const BaseNode = ({
   children,
   minWidth = 240,
 }) => {
+  const [hovered, setHovered] = useState(false);
+  const hideTimer = useRef(null);
+
+  const onEnter = () => { clearTimeout(hideTimer.current); setHovered(true); };
+  const onLeave = () => { hideTimer.current = setTimeout(() => setHovered(false), 80); };
+
   return (
     <div
-      className="vs-node relative rounded-xl shadow-2xl overflow-hidden"
-      style={{
-        minWidth,
-        background: '#1a1d2b',
-        border: '1px solid #1e2236',
-        borderLeft: `3px solid ${color}`,
-        boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-        transition: 'box-shadow 0.2s',
-      }}
+      style={{ minWidth, position: 'relative' }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
     >
-      {/* Input handles */}
+      {/* Hover toolbar — lives ABOVE the card, outside overflow-hidden */}
+      {hovered && (
+        <NodeActions nodeId={id} color={color} />
+      )}
+
+      {/* Input handles — outside overflow-hidden so they're never clipped */}
       {inputs.map((input, i) => (
         <Handle
           key={input.id}
@@ -34,8 +96,7 @@ const BaseNode = ({
           id={`${id}-${input.id}`}
           title={input.label}
           style={{
-            width: 10,
-            height: 10,
+            width: 10, height: 10,
             background: color,
             border: '2px solid #0c0e18',
             borderRadius: '50%',
@@ -45,33 +106,45 @@ const BaseNode = ({
         />
       ))}
 
-      {/* Header */}
+      {/* Node card */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5"
-        style={{ borderBottom: '1px solid #1e2236' }}
+        className="vs-node rounded-xl overflow-hidden shadow-2xl"
+        style={{
+          background: '#1a1d2b',
+          border: '1px solid #1e2236',
+          borderLeft: `3px solid ${color}`,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+          transition: 'box-shadow 0.2s',
+        }}
       >
-        {Icon && (
-          <div
-            className="flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0"
-            style={{ background: `${color}22` }}
-          >
-            <Icon size={13} color={color} strokeWidth={2.5} />
-          </div>
-        )}
-        <span
-          className="text-[10px] font-semibold uppercase tracking-widest"
-          style={{ color: '#8892a4' }}
+        {/* Header */}
+        <div
+          className="flex items-center gap-2 px-3 py-2.5"
+          style={{ borderBottom: !!children ? '1px solid #1e2236' : 'none' }}
         >
-          {title}
-        </span>
+          {Icon && (
+            <div
+              className="flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0"
+              style={{ background: `${color}22` }}
+            >
+              <Icon size={13} color={color} strokeWidth={2.5} />
+            </div>
+          )}
+          <span
+            className="text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: '#8892a4' }}
+          >
+            {title}
+          </span>
+        </div>
+
+        {/* Body */}
+        {!!children && (
+          <div className="p-3 flex flex-col gap-2.5">{children}</div>
+        )}
       </div>
 
-      {/* Body — only rendered when children are present */}
-      {!!children && (
-        <div className="p-3 flex flex-col gap-2.5">{children}</div>
-      )}
-
-      {/* Output handles */}
+      {/* Output handles — outside overflow-hidden */}
       {outputs.map((output, i) => (
         <Handle
           key={output.id}
@@ -80,8 +153,7 @@ const BaseNode = ({
           id={`${id}-${output.id}`}
           title={output.label}
           style={{
-            width: 10,
-            height: 10,
+            width: 10, height: 10,
             background: color,
             border: '2px solid #0c0e18',
             borderRadius: '50%',

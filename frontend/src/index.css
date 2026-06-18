@@ -64,6 +64,58 @@
     @apply flex flex-wrap gap-1 mt-0.5;
   }
 
+  /* ── Node hover action toolbar ───────────────────────────── */
+  .node-actions {
+    @apply absolute flex items-center gap-1 z-50;
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1d2b;
+    border: 1px solid #252a3e;
+    border-radius: 8px;
+    padding: 4px 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    animation: nodeActionsIn 0.12s ease;
+  }
+
+  .node-action-btn {
+    @apply flex items-center justify-center w-[26px] h-[26px] rounded-md;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #8892a4;
+    transition: background 0.12s, color 0.12s;
+  }
+  .node-action-btn:hover {
+    background: #252a3e;
+    color: #e2e8f0;
+  }
+  .node-action-btn--danger:hover {
+    background: rgba(244, 63, 94, 0.15);
+    color: #f43f5e;
+  }
+
+  /* Connect banner */
+  .connect-banner {
+    @apply absolute flex items-center gap-2 text-xs font-medium rounded-lg px-3 py-2 z-50;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1d2b;
+    border: 1px solid #6366f1;
+    color: #e2e8f0;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+    animation: nodeActionsIn 0.15s ease;
+    pointer-events: none;
+  }
+  .connect-kbd {
+    @apply rounded px-1.5 py-0.5 text-[10px] font-mono;
+    background: #0c0e18;
+    border: 1px solid #252a3e;
+    color: #8892a4;
+  }
+
   /* Sidebar node row */
   .sidebar-node {
     @apply flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg transition-colors select-none;
@@ -108,7 +160,8 @@
   stroke-width: 2.5 !important;
 }
 
-.react-flow__node.selected > .vs-node {
+/* wrapper now sits between react-flow__node and vs-node — use descendant selector */
+.react-flow__node.selected .vs-node {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5), 0 8px 32px rgba(0, 0, 0, 0.6) !important;
   border-color: #6366f1 !important;
 }
@@ -145,4 +198,10 @@
 .react-flow__controls-button:hover {
   background: #1a1d2b !important;
   fill: #e2e8f0 !important;
+}
+
+/* ── Shared animations ───────────────────────────────────────── */
+@keyframes nodeActionsIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
 }
