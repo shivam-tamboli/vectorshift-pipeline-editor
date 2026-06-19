@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { useStore } from './store';
 import { shallow } from 'zustand/shallow';
