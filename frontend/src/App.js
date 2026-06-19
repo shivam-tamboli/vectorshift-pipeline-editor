@@ -1,9 +1,10 @@
-import { TopBar }      from './topBar';
-import { NodeSidebar } from './sidebar';
-import { PipelineUI }  from './ui';
-import { StatusBar }   from './statusBar';
-import { ConfigPanel } from './configPanel';
-import { Analytics }   from '@vercel/analytics/react';
+import { TopBar }        from './topBar';
+import { NodeSidebar }   from './sidebar';
+import { PipelineUI }    from './ui';
+import { SubmitButton }  from './submit';
+import { StatusBar }     from './statusBar';
+import { ConfigPanel }   from './configPanel';
+import { Analytics }     from '@vercel/analytics/react';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <NodeSidebar />
         <div className="flex flex-col flex-1 overflow-hidden min-w-0">
           <PipelineUI />
+          <SubmitButton />
           <StatusBar />
         </div>
         <ConfigPanel />

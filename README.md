@@ -1,69 +1,76 @@
 # VectorShift Pipeline Editor
 
-A visual drag-and-drop pipeline builder for designing AI workflows. Drag nodes onto a canvas, connect them with arrows, and submit to validate whether the pipeline is logically correct.
+A visual drag-and-drop pipeline builder where you design AI workflows by connecting nodes on a canvas. When you're done, hit **Validate Pipeline** to check whether your pipeline is structurally valid.
 
-**Live Demo:** [vectorshift-pipeline-editor-tau.vercel.app](https://vectorshift-pipeline-editor-tau.vercel.app)  
-**Backend API:** [vectorshift-pipeline-editor.onrender.com](https://vectorshift-pipeline-editor.onrender.com)
+**Live:** [vectorshift-pipeline-editor-tau.vercel.app](https://vectorshift-pipeline-editor-tau.vercel.app)  
+**API:** [vectorshift-pipeline-editor.onrender.com](https://vectorshift-pipeline-editor.onrender.com)
 
 ---
 
 ## Screenshots
 
-### Pipeline Canvas
-Drag any of the 9 node types from the toolbar and connect them with arrows.
-
+**Canvas with connected nodes**  
 ![Pipeline Canvas](./screenshots/pipeline-canvas.png)
 
-### Valid Pipeline — No Loop Detected
-A clean directional pipeline passes the DAG check.
+**Valid pipeline — no cycles detected**  
+![Valid Result](./screenshots/valid-pipeline.png)
 
-![Valid Pipeline](./screenshots/valid-pipeline.png)
-
-### Invalid Pipeline — Loop Detected
-A circular connection is caught and flagged immediately.
-
-![Invalid Pipeline](./screenshots/invalid-pipeline.png)
+**Invalid pipeline — loop detected**  
+![Invalid Result](./screenshots/invalid-pipeline.png)
 
 ---
 
-## What it does
+## What I built
 
-You drag blocks (nodes) onto a canvas, connect them with arrows to show how data flows, and click Submit. The backend analyzes the pipeline and tells you three things — how many nodes, how many edges, and whether the flow is valid (no loops). If you accidentally create a circular connection, it catches it.
+This is my submission for the VectorShift Frontend Technical Assessment. It covers all four parts:
 
-The concept is similar to tools like n8n or LangFlow — you design an AI workflow visually instead of writing code.
+### Part 1 — Node Abstraction
+
+I created `BaseNode.js` as a shared component that all nine node types extend. It handles renders, handles (inputs/outputs), hover toolbar, selection glow, and layout in one place. Adding a new node is now 10–15 lines — just pass a type, color, icon, and handle config.
+
+There are two layout modes inside BaseNode:
+- **CompactNode** — 80×80 square icon card, used by most nodes
+- **WideNode** — rectangular card with a header and body, used by TextNode so the textarea is visible on the canvas
+
+Original nodes: Input, Output, LLM, Text  
+Five new nodes I added: **Filter**, **API Request**, **Transform**, **Merge**, **Note**
+
+### Part 2 — Styling
+
+Full dark UI built with Tailwind CSS and inline styles. Components covered:
+- Top bar with logo and editable pipeline name
+- Left sidebar with node catalog, search, and collapsible categories
+- Canvas with dot grid, bezier edges, mini-map, and controls
+- Right config panel that slides open when you click a node
+- Bottom submit bar showing node/edge counts and the validate button
+
+Nodes glow green when selected, edges connected to a selected node turn green, and hover reveals a quick-action toolbar (delete, duplicate, configure, quick-connect).
+
+### Part 3 — Text Node Logic
+
+Two behaviors added to the Text node:
+
+1. **Auto-resize** — the node width is calculated from the longest line of text, and height grows with `scrollHeight` as you type more lines.
+
+2. **Variable handles** — typing `{{variable_name}}` inside the text area extracts the variable name with a regex and creates a new input handle on the left side of the node for it. Multiple unique variables each get their own handle. These update live as you type.
+
+### Part 4 — Backend Integration
+
+`submit.js` sends the current nodes and edges as JSON to `POST /pipelines/parse` on the FastAPI backend. The backend returns:
+
+```json
+{ "num_nodes": 3, "num_edges": 2, "is_dag": true }
+```
+
+The frontend shows the result in a modal with a clear valid/invalid status and a plain-English explanation.
+
+On the backend, `main.py` runs a DFS-based cycle detection algorithm. It builds an adjacency list from the edges and walks the graph — if it finds a back edge (a node it's already visiting in the current path), it flags the pipeline as invalid.
 
 ---
 
-## Features
+## Running it locally
 
-- **9 node types** — Input, Output, LLM, Text, Filter, API Request, Transform, Merge, Note
-- **Drag and drop canvas** — built on ReactFlow with snap-to-grid
-- **Smart Text node** — type `{{variable_name}}` and a new input handle appears automatically for that variable
-- **Auto-resize** — Text node height grows as you type more content
-- **Pipeline validation** — checks node count, edge count, and DAG validity on submit
-- **Loop detection** — DFS-based cycle detection catches circular connections
-- **Result modal** — clean popup with valid/invalid status and helpful message
-- **Dark theme** — fully styled professional UI
-
----
-
-## Tech Stack
-
-**Frontend**
-- React 18
-- ReactFlow 11
-- Zustand 4
-
-**Backend**
-- Python 3
-- FastAPI
-- Pydantic
-
----
-
-## Running locally
-
-You need two terminals.
+You need two terminals open at the same time.
 
 **Frontend**
 ```bash
@@ -71,7 +78,7 @@ cd frontend
 npm install
 npm start
 ```
-Opens at `http://localhost:3000`
+Runs at `http://localhost:3000`
 
 **Backend**
 ```bash
@@ -81,103 +88,88 @@ uvicorn main:app --reload
 ```
 Runs at `http://localhost:8000`
 
+If the frontend can't reach the backend, check that `REACT_APP_API_URL` is either unset (defaults to `http://localhost:8000`) or set to the correct URL.
+
 ---
 
-## How to use
+## Using the app
 
-1. Drag nodes from the toolbar onto the canvas
-2. Hover over a node's edge until you see a dot, then drag to another node to connect them
-3. Try the **Text node** — type `Hello {{name}}, your order {{id}} is ready` and watch input handles appear for each variable
-4. Click **Submit Pipeline** at the bottom
+1. Drag a node from the left sidebar onto the canvas
+2. Hover a node's edge until a dot appears, then drag from that dot to another node
+3. Try the **Text node** — type `Hello {{name}}, your order is {{id}}` and watch handles appear for `name` and `id`
+4. Click **Validate Pipeline** in the bottom bar
 5. A modal shows the node count, edge count, and whether the pipeline is a valid DAG
 
+Right-click the canvas or any node for more options.
+
 ---
 
-## Node Types
+## Node reference
 
-| Node | Inputs | Outputs | Description |
+| Node | Inputs | Outputs | What it does |
 |---|---|---|---|
-| Input | — | 1 | Entry point for pipeline data |
-| Output | 1 | — | Final destination for the result |
-| LLM | 2 (system, prompt) | 1 | Sends prompts to a language model |
-| Text | dynamic | 1 | Text with `{{variable}}` placeholders |
+| Input | — | 1 | Entry point for data flowing into the pipeline |
+| Output | 1 | — | Terminal node that receives the final result |
+| LLM | 2 (system, prompt) | 1 | Sends a prompt to a language model |
+| Text | dynamic | 1 | Text template with `{{variable}}` input handles |
 | Filter | 1 | 2 (pass, fail) | Routes data based on a condition |
-| API Request | 1 | 1 | Makes an HTTP request to an external URL |
-| Transform | 1 | 1 | Applies a transformation (uppercase, trim, etc.) |
-| Merge | 2 | 1 | Combines two inputs into one output |
-| Note | — | — | Sticky note on the canvas, no connections |
+| API Request | 1 | 1 | Makes an HTTP request to an external endpoint |
+| Transform | 1 | 1 | Applies a string transformation (uppercase, trim, etc.) |
+| Merge | 2 | 1 | Combines two inputs into a single output |
+| Note | — | — | Freeform annotation on the canvas, no connections |
 
 ---
 
-## API
-
-### `POST /pipelines/parse`
-
-**Request**
-```json
-{
-  "nodes": [{ "id": "customInput-1" }, { "id": "llm-1" }, { "id": "customOutput-1" }],
-  "edges": [{ "source": "customInput-1", "target": "llm-1" }, { "source": "llm-1", "target": "customOutput-1" }]
-}
-```
-
-**Response**
-```json
-{
-  "num_nodes": 3,
-  "num_edges": 2,
-  "is_dag": true
-}
-```
-
-`is_dag` is `true` when the pipeline has no circular connections and will execute cleanly from start to finish.
-
----
-
-## Project Structure
+## Project structure
 
 ```
 frontend_technical_assessment/
-├── screenshots/
-│   ├── pipeline-canvas.png
-│   ├── valid-pipeline.png
-│   └── invalid-pipeline.png
 ├── frontend/
 │   └── src/
 │       ├── nodes/
-│       │   ├── BaseNode.js        ← shared abstraction all nodes extend
+│       │   ├── BaseNode.js        ← abstraction all nodes are built on
 │       │   ├── inputNode.js
 │       │   ├── outputNode.js
 │       │   ├── llmNode.js
 │       │   ├── textNode.js        ← auto-resize + {{variable}} handles
-│       │   ├── filterNode.js
-│       │   ├── apiNode.js
-│       │   ├── transformNode.js
-│       │   ├── mergeNode.js
-│       │   └── noteNode.js
+│       │   ├── filterNode.js      ← new
+│       │   ├── apiNode.js         ← new
+│       │   ├── transformNode.js   ← new
+│       │   ├── mergeNode.js       ← new
+│       │   └── noteNode.js        ← new
 │       ├── App.js
 │       ├── ui.js                  ← ReactFlow canvas
-│       ├── toolbar.js
+│       ├── sidebar.js             ← node catalog + search
+│       ├── topBar.js              ← logo + pipeline name
+│       ├── submit.js              ← validate button + result modal
+│       ├── statusBar.js           ← node/edge count + zoom
+│       ├── configPanel.js         ← per-node settings panel
 │       ├── store.js               ← Zustand state
-│       ├── submit.js              ← Submit button + result modal
-│       └── index.css              ← dark theme
+│       └── index.css
 └── backend/
-    ├── main.py                    ← FastAPI + DAG validation logic
+    ├── main.py                    ← FastAPI + DAG validation
     └── requirements.txt
 ```
 
 ---
 
-## Environment Variables
+## Tech stack
+
+**Frontend** — React 18, ReactFlow 11, Zustand 4, Tailwind CSS 3, Radix UI, lucide-react  
+**Backend** — Python 3, FastAPI, Pydantic
+
+---
+
+## Environment variables
 
 **Backend (Render)**
 
-| Variable | Description |
+| Variable | Value |
 |---|---|
-| `ALLOWED_ORIGINS` | Comma-separated list of allowed frontend URLs |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed frontend URLs (e.g. your Vercel URL) |
 
 **Frontend (Vercel)**
 
-| Variable | Description |
+| Variable | Value |
 |---|---|
 | `REACT_APP_API_URL` | URL of the deployed backend |
