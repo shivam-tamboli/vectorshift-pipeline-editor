@@ -313,7 +313,7 @@ export const PipelineUI = () => {
             ))}
 
             <p style={{ color: '#333', fontSize: 10, marginTop: 8 }}>
-              Right-click the canvas for more options · Press&nbsp;<kbd style={{ background:'#2a2a2a',border:'1px solid #3a3a3a',borderRadius:4,padding:'1px 5px',color:'#888',fontSize:10 }}>?</kbd>&nbsp;for shortcuts
+              Right-click the canvas for more options
             </p>
           </div>
         </div>
